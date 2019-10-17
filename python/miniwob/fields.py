@@ -154,7 +154,7 @@ def extract_click_checkboxes(utterance):
         targets = []
     else:
         targets = re.split(", ?", targets)
-    fields = dict(zip(["target {}".format(i) for i in xrange(len(targets))], targets))
+    fields = dict(zip(["target {}".format(i) for i in range(len(targets))], targets))
     fields["button"] = "submit"
     return Fields(fields)
 
@@ -179,7 +179,7 @@ def extract_click_checkboxes_soft(utterance):
         r"Select words similar to (.*) and click Submit\.", utterance
     ).group(1)
     targets = re.split(", ?", targets)
-    fields = dict(zip(["target {}".format(i) for i in xrange(len(targets))], targets))
+    fields = dict(zip(["target {}".format(i) for i in range(len(targets))], targets))
     fields["button"] = "submit"
     return Fields(fields)
 
@@ -1126,7 +1126,7 @@ def extract_utterances():
     env = MiniWoBEnvironment(task_name)
     base_url = os.environ.get("MINIWOB_BASE_URL")
     env.configure(num_instances=4, seeds=range(4), base_url=base_url)
-    for i in xrange(25):
+    for i in range(25):
         states = env.reset()
         for state in states:
             print("UTT:\t{}".format(state.utterance.replace("\n", " ")))
