@@ -1,4 +1,4 @@
-import regex as re
+import re
 
 
 def strip_punctuation(uni):
@@ -10,7 +10,7 @@ def strip_punctuation(uni):
     Returns:
         unicode
     """
-    return re.sub(ur"\p{P}+", " ", uni)
+    return re.sub(r"\p{P}+", " ", uni)
 
 
 def strip_whitespace(uni):
@@ -22,7 +22,7 @@ def strip_whitespace(uni):
     Returns:
         unicode
     """
-    return re.sub(ur"\s+", u"", uni)
+    return re.sub(r"\s+", u"", uni)
 
 
 def find_sublist(l, sublist):
@@ -38,7 +38,7 @@ def find_sublist(l, sublist):
     """
     for i in xrange(len(l)):
         # Check index 0 first for optimization
-        if l[i] == sublist[0] and l[i: i + len(sublist)] == sublist:
+        if l[i] == sublist[0] and l[i : i + len(sublist)] == sublist:
             return i
     return -1
 
@@ -51,7 +51,7 @@ class Phrase(object):
     """
 
     # I like "trains". --> [I, like, ", trains, ", .]
-    TOKENIZER = re.compile(r'\w+|[^\w\s]', re.UNICODE | re.MULTILINE | re.DOTALL)
+    TOKENIZER = re.compile(r"\w+|[^\w\s]", re.UNICODE | re.MULTILINE | re.DOTALL)
 
     def __init__(self, text):
         """Initialize a Phrase.
@@ -59,7 +59,7 @@ class Phrase(object):
         Args:
             text (str or unicode)
         """
-        self._text = unicode(text)
+        self._text = str(text)
         self._tokens = None
 
     @property
@@ -98,7 +98,7 @@ class Phrase(object):
         """
         if self._tokens is None:
             self._tokenize()
-        return self._text[self._token_spans[start][0]:self._token_spans[end-1][1]]
+        return self._text[self._token_spans[start][0] : self._token_spans[end - 1][1]]
 
     def __repr__(self):
         return repr(self._text)
