@@ -1,4 +1,5 @@
 import collections
+from collections import OrderedDict
 import json
 import re
 import os
@@ -24,7 +25,7 @@ def get_field_extractor(task_name):
 def _add(task_name, regex, keys):
     def extractor(utterance):
         match = re.match(regex, utterance)
-        return Fields(dict(zip(keys, match.groups())))
+        return Fields(OrderedDict(zip(keys, match.groups())))
 
     FIELD_EXTRACTORS[task_name] = extractor
 
@@ -37,7 +38,10 @@ class Fields(object):
     """
 
     def __init__(self, d):
-        self._d = collections.OrderedDict(sorted(d.items()))
+        if isinstance(d, OrderedDict):
+            self._d = d
+        else:
+            self._d = OrderedDict(sorted(d.items()))
         if not self._d:
             # Ensure at least one key to prevent the type prob. from being ignored
             self._d["dummy"] = "dummy"
@@ -64,8 +68,8 @@ class Fields(object):
 
 _add(
     "bisect-angle",
-    r"Create a line that bisects the angle evenly in two, then press submit\.",
-    [],
+    r"Create a line that bisects the angle evenly in two, then press (.*)\.",
+    ["submit"],
 )
 
 # Book the shortest one-way flight from: Prudhoe Bay/Deadhorse, AK to: EUE on 11/08/2016.
@@ -99,8 +103,8 @@ _add("chase-circle", r"Keep your mouse inside the circle as it moves around\.", 
 # Select 12/10/2016 as the date and hit submit.
 _add(
     "choose-date",
-    r"Select 0*(\d*)/0*(\d*)/0*(\d*) as the date and hit submit\.",
-    ["month", "day", "year"],
+    r"Select 0*(\d*)/0*(\d*)/0*(\d*) as the date and hit (.*)\.",
+    ["month", "day", "year", "submit"],
 )
 FIELD_EXTRACTORS["choose-date-nodelay"] = FIELD_EXTRACTORS[
     "choose-date-easy"
@@ -116,12 +120,12 @@ FIELD_EXTRACTORS["choose-date-nodelay"] = FIELD_EXTRACTORS[
 # Select Poland from the list and click Submit.
 # Select Botswana from the list and click Submit.
 # Select Robyn from the list and click Submit.
-_add("choose-list", r"Select (.*) from the list and click Submit\.", ["target"])
+_add("choose-list", r"Select (.*) from the list and click (.*)\.", ["target", "submit"])
 
 _add(
     "circle-center",
-    r"Find and click on the center of the circle, then press submit\.",
-    [],
+    r"Find and click on the center of the circle, then press (.*)\.",
+    ["submit"],
 )
 
 # Click on the "Cancel" button.
@@ -136,7 +140,11 @@ _add(
 # Click on the "no" button.
 _add("click-button", r'Click on the "(.*)" button\.', ["target"])
 
-_add("click-button-sequence", r"Click button ONE, then click button TWO\.", [])
+_add(
+    "click-button-sequence",
+    r"Click button (.*), then click button (.*)\.",
+    ["target 0", "target 1"],
+)
 
 # Select nothing and click Submit.
 # Select delivering,walked and click Submit.
@@ -154,8 +162,10 @@ def extract_click_checkboxes(utterance):
         targets = []
     else:
         targets = re.split(", ?", targets)
-    fields = dict(zip(["target {}".format(i) for i in range(len(targets))], targets))
-    fields["button"] = "submit"
+    fields = OrderedDict(
+        zip(["target {}".format(i) for i in range(len(targets))], targets)
+    )
+    fields["submit"] = "Submit"
     return Fields(fields)
 
 
@@ -179,8 +189,10 @@ def extract_click_checkboxes_soft(utterance):
         r"Select words similar to (.*) and click Submit\.", utterance
     ).group(1)
     targets = re.split(", ?", targets)
-    fields = dict(zip(["target {}".format(i) for i in range(len(targets))], targets))
-    fields["button"] = "submit"
+    fields = OrderedDict(
+        zip(["target {}".format(i) for i in range(len(targets))], targets)
+    )
+    fields["submit"] = "Submit"
     return Fields(fields)
 
 
@@ -220,7 +232,7 @@ FIELD_EXTRACTORS["click-collapsible-2-nodelay"] = FIELD_EXTRACTORS[
 # Click on the colored box.
 _add("click-color", r"Click on the (.*) colored box\.", ["target"])
 
-_add("click-dialog", r'Close the dialog box by clicking the "x"\.', [])
+_add("click-dialog", r'(.*) the dialog box by clicking the "x"\.', ["target"])
 
 # Click the button in the dialog box labeled "Cancel".
 # Click the button in the dialog box labeled "Cancel".
@@ -288,7 +300,7 @@ _add(
 # Select wtuEd4 and click Submit.
 # Select oagd and click Submit.
 # Select qGWE and click Submit.
-_add("click-option", r"Select (.*) and click Submit\.", ["target"])
+_add("click-option", r"Select (.*) and click (.*)\.", ["target", "submit"])
 
 # Expand the pie menu below and click on the item labeled "o".
 # Expand the pie menu below and click on the item labeled "h".
@@ -319,8 +331,8 @@ FIELD_EXTRACTORS["click-pie-nodelay"] = FIELD_EXTRACTORS["click-pie"]
 # Select Cocos Islands from the scroll list and click Submit.
 _add(
     "click-scroll-list",
-    r"Select (.*) from the scroll list and click Submit\.",
-    ["target"],
+    r"Select (.*) from the scroll list and click (.*)\.",
+    ["target", "submit"],
 )
 
 # Select all the shades of blue and press Submit.
@@ -333,7 +345,7 @@ _add(
 # Select all the shades of green and press Submit.
 # Select all the shades of red and press Submit.
 # Select all the shades of green and press Submit.
-_add("click-shades", r"Select all the shades of (.*) and press Submit\.", ["target"])
+_add("click-shades", r"Select (.*) and press (.*)\.", ["target", "submit"])
 
 # Click on a 0
 # Click on a large green digit
@@ -376,7 +388,7 @@ FIELD_EXTRACTORS["click-shape"] = extract_click_shape
 # Click on Tab #3.
 # Click on Tab #2.
 # Click on Tab #2.
-_add("click-tab", r"Click on Tab #(.*)\.", ["target"])
+_add("click-tab", r"Click on (.*)\.", ["target"])
 
 # Switch between the tabs to find and click on the link "retreated".
 # Switch between the tabs to find and click on the link "culminating".
@@ -397,7 +409,7 @@ FIELD_EXTRACTORS["click-tab-2-easy"] = FIELD_EXTRACTORS[
     "click-tab-2-medium"
 ] = FIELD_EXTRACTORS["click-tab-2-hard"] = FIELD_EXTRACTORS["click-tab-2"]
 
-_add("click-test", r"Click the button\.", [])
+_add("click-test", r"Click the (.*)\.", ["target"])
 
 _add("click-test-2", r"Click button (.*)\.", ["target"])
 
@@ -417,8 +429,8 @@ _add("click-widget", r'Click on a "(.*)" widget\.', ["target"])
 
 _add(
     "copy-paste",
-    r"Copy the text in the textarea below, paste it into the textbox and press Submit\.",
-    [],
+    r"Copy the text in the (.*) below, paste it into the (.*) and press (.*)\.",
+    ["copy", "paste", "submit"],
 )
 
 # Copy the text from the 1st text area below and paste it into the text input, then press Submit.
@@ -433,8 +445,8 @@ _add(
 # Copy the text from the 2nd text area below and paste it into the text input, then press Submit.
 _add(
     "copy-paste-2",
-    r"Copy the text from the (\d+).. text area below and paste it into the text input, then press Submit\.",
-    ["target"],
+    r"Copy the text from the (.*) below and paste it into the (.*), then press (.*)\.",
+    ["copy", "paste", "submit"],
 )
 
 # How many small aqua items are there?
@@ -492,7 +504,7 @@ _add(
 # Drag the circle left then press Submit.
 # Drag the circle down then press Submit.
 # Drag the circle up then press Submit.
-_add("drag-item", r"Drag the circle (.*) then press Submit\.", ["target"])
+_add("drag-item", r"Drag the circle (.*) then press (.*)\.", ["target", "submit"])
 
 # Drag Lanna to the 5th position.
 # Drag Blythe up by one position.
@@ -605,7 +617,9 @@ FIELD_EXTRACTORS["email-inbox-forward-nl"] = FIELD_EXTRACTORS[
 # Enter 01/26/2018 as the date and hit submit.
 # Enter 03/15/2018 as the date and hit submit.
 # Enter 09/11/2017 as the date and hit submit.
-_add("enter-date", r"Enter (.*) as the date and hit submit\.", ["target"])
+_add(
+    "enter-date", r"Enter (.*) as the (.*) and hit (.*)\.", ["date", "paste", "target"]
+)
 
 # Enter the password "KA6" into both text fields and press submit.
 # Enter the password "d1u" into both text fields and press submit.
@@ -619,8 +633,8 @@ _add("enter-date", r"Enter (.*) as the date and hit submit\.", ["target"])
 # Enter the password "2f" into both text fields and press submit.
 _add(
     "enter-password",
-    r'Enter the password "(.*)" into both text fields and press submit\.',
-    ["target"],
+    r'Enter the password "(.*)" into (.*) and press (.*)\.',
+    ["password", "paste", "submit"],
 )
 
 # Enter "Donovan" into the text field and press Submit.
@@ -633,7 +647,11 @@ _add(
 # Enter "Michel" into the text field and press Submit.
 # Enter "Emile" into the text field and press Submit.
 # Enter "Deneen" into the text field and press Submit.
-_add("enter-text", r'Enter "(.*)" into the text field and press Submit\.', ["target"])
+_add(
+    "enter-text",
+    r'Enter "(.*)" into the (.*) and press (.*)\.',
+    ["name", "paste", "submit"],
+)
 
 # Type "KENETH" in all lower case letters in the text input and press Submit.
 # Type "CHAS" in all lower case letters in the text input and press Submit.
@@ -647,8 +665,8 @@ _add("enter-text", r'Enter "(.*)" into the text field and press Submit\.', ["tar
 # Type "JOYE" in all lower case letters in the text input and press Submit.
 _add(
     "enter-text-2",
-    r'Type "(.*)" in all (.*) case letters in the text input and press Submit\.',
-    ["text", "case"],
+    r'Type "(.*)" in all (.*) case letters in the (.*) and press (.*)\.',
+    ["text", "case", "paste", "submit"],
 )
 
 # Enter "LQosL" into the text field and press Submit.
@@ -663,8 +681,8 @@ _add(
 # Enter "8" into the text field and press Submit.
 _add(
     "enter-text-dynamic",
-    r'Enter "(.*)" into the text field and press Submit\.',
-    ["target"],
+    r'Enter "(.*)" into the (.*) and press (.*)\.',
+    ["text", "paste", "submit"],
 )
 
 # Enter 3:57 AM as the time and press submit.
@@ -679,15 +697,15 @@ _add(
 # Enter 12:25 AM as the time and press submit.
 def extract_enter_time(utterance):
     target = re.match(r"Enter (.*) as the time and press submit\.", utterance).group(1)
-    return Fields({"target": target.replace(" ", "")})
+    return Fields({"time": target.replace(" ", ""), "submit": "submit"})
 
 
 FIELD_EXTRACTORS["enter-time"] = extract_enter_time
 
 _add(
     "find-midpoint",
-    r"Find and click on the shortest mid-point between the two points, then press submit\.",
-    [],
+    r"Find and click on the shortest mid-point between the two points, then press (.*)\.",
+    ["submit"],
 )
 
 # Find the 7th word in the paragraph, type that into the textbox and press "Submit".
@@ -702,11 +720,11 @@ _add(
 # Find the 9th word in the paragraph, type that into the textbox and press "Submit".
 _add(
     "find-word",
-    r'Find the (\d+).. word in the paragraph, type that into the textbox and press "Submit"\.',
-    ["target"],
+    r'Find the (.*), type that into the (.*) and press "(.*)"\.',
+    ["copy", "paste", "target"],
 )
 
-_add("focus-text", r"Focus into the textbox\.", [])
+_add("focus-text", r"Focus into the (.*)\.", ["target"])
 
 # Focus into the 1st input textbox.
 # Focus into the 3rd input textbox.
@@ -718,7 +736,7 @@ _add("focus-text", r"Focus into the textbox\.", [])
 # Focus into the 3rd input textbox.
 # Focus into the 2nd input textbox.
 # Focus into the 1st input textbox.
-_add("focus-text-2", r"Focus into the (\d+).. input textbox\.", ["target"])
+_add("focus-text-2", r"Focus into the (.*)\.", ["target"])
 
 # Click on the grid coordinate (-1,-1).
 # Click on the grid coordinate (-1,0).
@@ -740,8 +758,8 @@ _add(
 
 _add(
     "highlight-text",
-    r"Highlight the text in the paragraph below and click submit\.",
-    [],
+    r"Highlight the text in the paragraph below and click (.*)\.",
+    ["submit"],
 )
 
 # Highlight the text in the 2nd paragraph and click submit.
@@ -756,8 +774,8 @@ _add(
 # Highlight the text in the 3rd paragraph and click submit.
 _add(
     "highlight-text-2",
-    r"Highlight the text in the (\d+).. paragraph and click submit\.",
-    ["target"],
+    r"Highlight the text in the (\d+).. paragraph and click (.*)\.",
+    ["target", "submit"],
 )
 
 _add("identify-shape", r"Click the button that best describes the figure below\.", [])
@@ -774,8 +792,8 @@ _add("identify-shape", r"Click the button that best describes the figure below\.
 # Enter the username "nathalie" and the password "MN" into the text fields and press login.
 _add(
     "login-user",
-    r'Enter the username "(.*)" and the password "(.*)" into the text fields and press login\.',
-    ["username", "password"],
+    r'Enter the username "(.*)" and the password "(.*)" into the text fields and press (.*)\.',
+    ["username", "password", "submit"],
 )
 FIELD_EXTRACTORS["login-user-popup"] = FIELD_EXTRACTORS["login-user"]
 
@@ -842,14 +860,14 @@ _add(
 # Enter the value of Religion into the text field and press Submit.
 _add(
     "read-table",
-    r"Enter the value of (.*) into the text field and press Submit\.",
-    ["target"],
+    r"Enter the value of (.*) into the (.*) and press (.*)\.",
+    ["copy", "paste", "submit"],
 )
 
 _add(
     "read-table-2",
-    r"Enter the value that corresponds with each label into the form and submit when done\.",
-    [],
+    r"Enter the value that corresponds with each label into the form and (.*) when done\.",
+    ["submit"],
 )
 
 # Resize the textarea so that the height is larger than its initial size then press Submit.
@@ -1041,7 +1059,9 @@ FIELD_EXTRACTORS["use-autocomplete-nodelay"] = extract_use_autocomplete
 # Select navy with the color picker and hit Submit.
 # Select white with the color picker and hit Submit.
 _add(
-    "use-colorwheel", r"Select (.*) with the color picker and hit Submit\.", ["target"]
+    "use-colorwheel",
+    r"Select (.*) with the color picker and hit (.*)\.",
+    ["target", "submit"],
 )
 
 _add(
@@ -1060,7 +1080,7 @@ _add(
 # Select 35 with the slider and hit Submit.
 # Select 20 with the slider and hit Submit.
 # Select 7 with the slider and hit Submit.
-_add("use-slider", r"Select (.*) with the slider and hit Submit\.", ["target"])
+_add("use-slider", r"Select (.*) with the slider and hit (.*)\.", ["target", "submit"])
 
 # Set the sliders to the combination [0,14,0] and submit.
 # Set the sliders to the combination [14,3,2] and submit.
@@ -1074,8 +1094,8 @@ _add("use-slider", r"Select (.*) with the slider and hit Submit\.", ["target"])
 # Set the sliders to the combination [18,20,15] and submit.
 _add(
     "use-slider-2",
-    r"Set the sliders to the combination \[(.*),(.*),(.*)\] and submit\.",
-    ["n1", "n2", "n3"],
+    r"Set the sliders to the combination \[(.*),(.*),(.*)\] and (.*)\.",
+    ["n1", "n2", "n3", "submit"],
 )
 
 # Select 5 with the spinner and hit Submit.
@@ -1088,12 +1108,14 @@ _add(
 # Select -3 with the spinner and hit Submit.
 # Select 5 with the spinner and hit Submit.
 # Select -4 with the spinner and hit Submit.
-_add("use-spinner", r"Select (.*) with the spinner and hit Submit\.", ["target"])
+_add(
+    "use-spinner", r"Select (.*) with the spinner and hit (.*)\.", ["target", "submit"]
+)
 
 _add(
     "visual-addition",
-    r"Type the total number of blocks into the textbox and press Submit\.",
-    [],
+    r"Type the total number of blocks into the textbox and press (.*)\.",
+    ["submit"],
 )
 
 
