@@ -120,7 +120,7 @@ FIELD_EXTRACTORS["choose-date-nodelay"] = FIELD_EXTRACTORS[
 # Select Poland from the list and click Submit.
 # Select Botswana from the list and click Submit.
 # Select Robyn from the list and click Submit.
-_add("choose-list", r"Select (.*) from the list and click (.*)\.", ["target", "submit"])
+_add("choose-list", r"Select (.*) from the list and click (.*)\.", ["select", "submit"])
 
 _add(
     "circle-center",
@@ -138,12 +138,12 @@ _add(
 # Click on the "Ok" button.
 # Click on the "ok" button.
 # Click on the "no" button.
-_add("click-button", r'Click on the "(.*)" button\.', ["target"])
+_add("click-button", r'Click on the "(.*)" button\.', ["click"])
 
 _add(
     "click-button-sequence",
     r"Click button (.*), then click button (.*)\.",
-    ["target 0", "target 1"],
+    ["click 0", "click 1"],
 )
 
 # Select nothing and click Submit.
@@ -163,7 +163,7 @@ def extract_click_checkboxes(utterance):
     else:
         targets = re.split(", ?", targets)
     fields = OrderedDict(
-        zip(["target {}".format(i) for i in range(len(targets))], targets)
+        zip(["select {}".format(i) for i in range(len(targets))], targets)
     )
     fields["submit"] = "Submit"
     return Fields(fields)
@@ -190,7 +190,7 @@ def extract_click_checkboxes_soft(utterance):
     ).group(1)
     targets = re.split(", ?", targets)
     fields = OrderedDict(
-        zip(["target {}".format(i) for i in range(len(targets))], targets)
+        zip(["select {}".format(i) for i in range(len(targets))], targets)
     )
     fields["submit"] = "Submit"
     return Fields(fields)
@@ -230,9 +230,9 @@ FIELD_EXTRACTORS["click-collapsible-2-nodelay"] = FIELD_EXTRACTORS[
 # Click on the colored box.
 # Click on the blue colored box.
 # Click on the colored box.
-_add("click-color", r"Click on the (.*) colored box\.", ["target"])
+_add("click-color", r"Click on the (.*) colored box\.", ["click"])
 
-_add("click-dialog", r'(.*) the dialog box by clicking the "x"\.', ["target"])
+_add("click-dialog", r'(Close) the dialog box by clicking the "x"\.', ["click"])
 
 # Click the button in the dialog box labeled "Cancel".
 # Click the button in the dialog box labeled "Cancel".
@@ -245,7 +245,7 @@ _add("click-dialog", r'(.*) the dialog box by clicking the "x"\.', ["target"])
 # Click the button in the dialog box labeled "Cancel".
 # Click the button in the dialog box labeled "Cancel".
 _add(
-    "click-dialog-2", r'Click the button in the dialog box labeled "(.*)"\.', ["target"]
+    "click-dialog-2", r'Click the button in the dialog box labeled "(.*)"\.', ["click"]
 )
 
 # Click on the link "nba".
@@ -258,7 +258,7 @@ _add(
 # Click on the link "rao".
 # Click on the link "class".
 # Click on the link "plummer".
-_add("click-link", r'Click on the link "(.*)"\.', ["target"])
+_add("click-link", r'Click on the link "(.*)"\.', ["click"])
 
 # Select Kelli
 # Select Vanya
@@ -271,7 +271,7 @@ _add("click-link", r'Click on the link "(.*)"\.', ["target"])
 # Select Kalila>Bird
 # Select Peria>Kata>Caitrin
 # TODO
-_add("click-menu", r"Select (.*)", ["target"])
+_add("click-menu", r"Select (.*)", ["click"])
 
 # Click the "Menu" button, and then find and click on the item with the icon.
 # Click the "Menu" button, and then find and click on the item with the icon.
@@ -287,7 +287,7 @@ _add("click-menu", r"Select (.*)", ["target"])
 _add(
     "click-menu-2",
     r'Click the "Menu" button, and then find and click on the item (.*)\.',
-    ["target"],
+    ["click"],
 )
 
 # Select D8 and click Submit.
@@ -300,7 +300,7 @@ _add(
 # Select wtuEd4 and click Submit.
 # Select oagd and click Submit.
 # Select qGWE and click Submit.
-_add("click-option", r"Select (.*) and click (.*)\.", ["target", "submit"])
+_add("click-option", r"Select (.*) and click (.*)\.", ["select", "submit"])
 
 # Expand the pie menu below and click on the item labeled "o".
 # Expand the pie menu below and click on the item labeled "h".
@@ -315,7 +315,7 @@ _add("click-option", r"Select (.*) and click (.*)\.", ["target", "submit"])
 _add(
     "click-pie",
     r'Expand the pie menu below and click on the item labeled "(.*)"\.',
-    ["target"],
+    ["click"],
 )
 FIELD_EXTRACTORS["click-pie-nodelay"] = FIELD_EXTRACTORS["click-pie"]
 
@@ -332,7 +332,7 @@ FIELD_EXTRACTORS["click-pie-nodelay"] = FIELD_EXTRACTORS["click-pie"]
 _add(
     "click-scroll-list",
     r"Select (.*) from the scroll list and click (.*)\.",
-    ["target", "submit"],
+    ["select", "submit"],
 )
 
 # Select all the shades of blue and press Submit.
@@ -345,7 +345,7 @@ _add(
 # Select all the shades of green and press Submit.
 # Select all the shades of red and press Submit.
 # Select all the shades of green and press Submit.
-_add("click-shades", r"Select (.*) and press (.*)\.", ["target", "submit"])
+_add("click-shades", r"Select (.*) and press (.*)\.", ["select", "submit"])
 
 # Click on a 0
 # Click on a large green digit
@@ -388,7 +388,7 @@ FIELD_EXTRACTORS["click-shape"] = extract_click_shape
 # Click on Tab #3.
 # Click on Tab #2.
 # Click on Tab #2.
-_add("click-tab", r"Click on (.*)\.", ["target"])
+_add("click-tab", r"Click on (.*)\.", ["click"])
 
 # Switch between the tabs to find and click on the link "retreated".
 # Switch between the tabs to find and click on the link "culminating".
@@ -403,17 +403,17 @@ _add("click-tab", r"Click on (.*)\.", ["target"])
 _add(
     "click-tab-2",
     r'Switch between the tabs to find and click on the link "(.*)"\.',
-    ["target"],
+    ["click"],
 )
 FIELD_EXTRACTORS["click-tab-2-easy"] = FIELD_EXTRACTORS[
     "click-tab-2-medium"
 ] = FIELD_EXTRACTORS["click-tab-2-hard"] = FIELD_EXTRACTORS["click-tab-2"]
 
-_add("click-test", r"Click the (.*)\.", ["target"])
+_add("click-test", r"Click the (.*)\.", ["click"])
 
-_add("click-test-2", r"Click button (.*)\.", ["target"])
+_add("click-test-2", r"Click button (.*)\.", ["click"])
 
-_add("click-test-transfer", r"Click button (.*)\.", ["target"])
+_add("click-test-transfer", r"Click button (.*)\.", ["click"])
 
 # Click on a "textarea" widget.
 # Click on a "checkbox" widget.
@@ -425,7 +425,7 @@ _add("click-test-transfer", r"Click button (.*)\.", ["target"])
 # Click on a "radio" widget.
 # Click on a "checkbox" widget.
 # Click on a "textarea" widget.
-_add("click-widget", r'Click on a "(.*)" widget\.', ["target"])
+_add("click-widget", r'Click on a "(.*)" widget\.', ["click"])
 
 _add(
     "copy-paste",
@@ -491,7 +491,7 @@ _add(
 _add(
     "drag-cube",
     r'Move the cube around so that "(.*)" is the active side facing the user\.',
-    ["target"],
+    ["drag"],
 )
 
 # Drag the circle up then press Submit.
@@ -504,7 +504,7 @@ _add(
 # Drag the circle left then press Submit.
 # Drag the circle down then press Submit.
 # Drag the circle up then press Submit.
-_add("drag-item", r"Drag the circle (.*) then press (.*)\.", ["target", "submit"])
+_add("drag-item", r"Drag the circle (.*) then press (.*)\.", ["drag", "submit"])
 
 # Drag Lanna to the 5th position.
 # Drag Blythe up by one position.
@@ -517,7 +517,7 @@ _add("drag-item", r"Drag the circle (.*) then press (.*)\.", ["target", "submit"
 # Drag Bari to the 5th position.
 # Drag Anestassia to the bottom.
 # TODO
-_add("drag-items", r"Drag (.*)\.", ["target"])
+_add("drag-items", r"Drag (.*)\.", ["drag"])
 
 # Drag Evvie to the top right.
 # Drag Shell to the bottom center.
@@ -530,7 +530,7 @@ _add("drag-items", r"Drag (.*)\.", ["target"])
 # Drag Kaila up by one.
 # Drag Cherry to the top center.
 # TODO
-_add("drag-items-grid", r"Drag (.*)\.", ["target"])
+_add("drag-items-grid", r"Drag (.*)\.", ["drag"])
 
 # Drag all triangles into the black box.
 # Drag all rectangles into the black box.
@@ -542,7 +542,7 @@ _add("drag-items-grid", r"Drag (.*)\.", ["target"])
 # Drag all circles into the black box.
 # Drag all triangles into the black box.
 # Drag all triangles into the black box.
-_add("drag-shapes", r"Drag all (.*) into the black box\.", ["target"])
+_add("drag-shapes", r"Drag all (.*) into the black box\.", ["drag"])
 
 _add(
     "drag-sort-numbers",
@@ -617,9 +617,7 @@ FIELD_EXTRACTORS["email-inbox-forward-nl"] = FIELD_EXTRACTORS[
 # Enter 01/26/2018 as the date and hit submit.
 # Enter 03/15/2018 as the date and hit submit.
 # Enter 09/11/2017 as the date and hit submit.
-_add(
-    "enter-date", r"Enter (.*) as the (.*) and hit (.*)\.", ["date", "paste", "target"]
-)
+_add("enter-date", r"Enter (.*) as the date and hit (.*)\.", ["date", "submit"])
 
 # Enter the password "KA6" into both text fields and press submit.
 # Enter the password "d1u" into both text fields and press submit.
@@ -633,8 +631,8 @@ _add(
 # Enter the password "2f" into both text fields and press submit.
 _add(
     "enter-password",
-    r'Enter the password "(.*)" into (.*) and press (.*)\.',
-    ["password", "paste", "submit"],
+    r'Enter the password "(.*)" into both text fields and press (.*)\.',
+    ["password", "submit"],
 )
 
 # Enter "Donovan" into the text field and press Submit.
@@ -649,8 +647,8 @@ _add(
 # Enter "Deneen" into the text field and press Submit.
 _add(
     "enter-text",
-    r'Enter "(.*)" into the (.*) and press (.*)\.',
-    ["name", "paste", "submit"],
+    r'Enter "(.*)" into the text field and press (.*)\.',
+    ["text", "submit"],
 )
 
 # Type "KENETH" in all lower case letters in the text input and press Submit.
@@ -665,8 +663,8 @@ _add(
 # Type "JOYE" in all lower case letters in the text input and press Submit.
 _add(
     "enter-text-2",
-    r'Type "(.*)" in all (.*) case letters in the (.*) and press (.*)\.',
-    ["text", "case", "paste", "submit"],
+    r'Type "(.*)" in all (.*) case letters in the text input and press (.*)\.',
+    ["text", "case", "submit"],
 )
 
 # Enter "LQosL" into the text field and press Submit.
@@ -681,8 +679,8 @@ _add(
 # Enter "8" into the text field and press Submit.
 _add(
     "enter-text-dynamic",
-    r'Enter "(.*)" into the (.*) and press (.*)\.',
-    ["text", "paste", "submit"],
+    r'Enter "(.*)" into the text field and press (.*)\.',
+    ["text", "submit"],
 )
 
 # Enter 3:57 AM as the time and press submit.
@@ -721,10 +719,10 @@ _add(
 _add(
     "find-word",
     r'Find the (.*), type that into the (.*) and press "(.*)"\.',
-    ["copy", "paste", "target"],
+    ["copy", "paste", "submit"],
 )
 
-_add("focus-text", r"Focus into the (.*)\.", ["target"])
+_add("focus-text", r"Focus into the (.*)\.", ["focus"])
 
 # Focus into the 1st input textbox.
 # Focus into the 3rd input textbox.
@@ -736,7 +734,7 @@ _add("focus-text", r"Focus into the (.*)\.", ["target"])
 # Focus into the 3rd input textbox.
 # Focus into the 2nd input textbox.
 # Focus into the 1st input textbox.
-_add("focus-text-2", r"Focus into the (.*)\.", ["target"])
+_add("focus-text-2", r"Focus into the (.*)\.", ["focus"])
 
 # Click on the grid coordinate (-1,-1).
 # Click on the grid coordinate (-1,0).
@@ -775,7 +773,7 @@ _add(
 _add(
     "highlight-text-2",
     r"Highlight the text in the (\d+).. paragraph and click (.*)\.",
-    ["target", "submit"],
+    ["highlight", "submit"],
 )
 
 _add("identify-shape", r"Click the button that best describes the figure below\.", [])
@@ -829,7 +827,7 @@ FIELD_EXTRACTORS["multi-orderings"] = FIELD_EXTRACTORS["multi-layouts"]
 _add(
     "navigate-tree",
     r'Navigate through the file tree\. Find and click on the folder or file named "(.*)"\.',
-    ["target"],
+    ["click"],
 )
 
 # Draw the number "9" in the checkboxes using the example on the right and press Submit when finished.
@@ -955,7 +953,7 @@ _add(
 _add(
     "social-media",
     r'For the user (.*), click on the "(.*)" button\.',
-    ["user", "button"],
+    ["user", "click"],
 )
 
 # Click the "Like" button on all posts by @nieves and then click Submit.
@@ -971,7 +969,7 @@ _add(
 _add(
     "social-media-all",
     r'Click the "(.*)" button on all posts by (.*) and then click (Submit)\.',
-    ["button", "user", "submit"],
+    ["click", "user", "submit"],
 )
 
 # Click the "Retweet" button on 3 posts by @etiam and then click Submit.
@@ -987,7 +985,7 @@ _add(
 _add(
     "social-media-some",
     r'Click the "(.*)" button on (.*) posts? by (.*) and then click (Submit)\.',
-    ["button", "amount", "user", "submit"],
+    ["click", "amount", "user", "submit"],
 )
 
 # Use the terminal below to delete a file ending with the extension .gif
@@ -1022,7 +1020,7 @@ _add(
 
 _add("tic-tac-toe", r"Playing as 'X', win a game of tic-tac-toe\.", [])
 
-_add("unicode-test", r'Click on the "(.*)" button\.', ["target"])
+_add("unicode-test", r'Click on the "(.*)" button\.', ["click"])
 
 # Enter an item that starts with "Mart" and ends with "ique".
 # Enter an item that starts with "Ni" and ends with "er".
@@ -1061,7 +1059,7 @@ FIELD_EXTRACTORS["use-autocomplete-nodelay"] = extract_use_autocomplete
 _add(
     "use-colorwheel",
     r"Select (.*) with the color picker and hit (.*)\.",
-    ["target", "submit"],
+    ["select", "submit"],
 )
 
 _add(
@@ -1080,7 +1078,7 @@ _add(
 # Select 35 with the slider and hit Submit.
 # Select 20 with the slider and hit Submit.
 # Select 7 with the slider and hit Submit.
-_add("use-slider", r"Select (.*) with the slider and hit (.*)\.", ["target", "submit"])
+_add("use-slider", r"Select (.*) with the slider and hit (.*)\.", ["select", "submit"])
 
 # Set the sliders to the combination [0,14,0] and submit.
 # Set the sliders to the combination [14,3,2] and submit.
@@ -1109,7 +1107,7 @@ _add(
 # Select 5 with the spinner and hit Submit.
 # Select -4 with the spinner and hit Submit.
 _add(
-    "use-spinner", r"Select (.*) with the spinner and hit (.*)\.", ["target", "submit"]
+    "use-spinner", r"Select (.*) with the spinner and hit (.*)\.", ["select", "submit"]
 )
 
 _add(
