@@ -1,0 +1,2 @@
+recursive-include html *.js *.css *.html
+recursive-include viewer *.js *.css *.html
