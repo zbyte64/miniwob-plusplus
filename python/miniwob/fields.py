@@ -122,6 +122,8 @@ FIELD_EXTRACTORS["choose-date-nodelay"] = FIELD_EXTRACTORS[
 # Select Robyn from the list and click Submit.
 _add("choose-list", r"Select (.*) from the list and click (.*)\.", ["select", "submit"])
 
+_add("choose-list-simple", r"Select (.*) from the list\.", ["select"])
+
 _add(
     "circle-center",
     r"Find and click on the center of the circle, then press (.*)\.",
@@ -634,6 +636,15 @@ _add(
     r'Enter the password "(.*)" into both text fields and press (.*)\.',
     ["password", "submit"],
 )
+
+
+def extract_enter_text(utterance):
+    words = re.match(r'Enter "(.*)" into (.*) text field\.', utterance)
+    return Fields({words.group(1): words.group(0)})
+
+
+FIELD_EXTRACTORS["enter-password-2"] = extract_enter_text
+
 
 # Enter "Donovan" into the text field and press Submit.
 # Enter "Rex" into the text field and press Submit.
