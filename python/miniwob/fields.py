@@ -640,7 +640,7 @@ _add(
 
 def extract_enter_text(utterance):
     words = re.match(r'Enter "(.*)" into (.*) text field\.', utterance)
-    return Fields({words.group(1): words.group(0)})
+    return Fields({words.group(2): words.group(1)})
 
 
 FIELD_EXTRACTORS["enter-password-2"] = extract_enter_text
